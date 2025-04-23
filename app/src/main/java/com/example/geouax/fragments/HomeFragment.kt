@@ -222,11 +222,12 @@ class HomeFragment : Fragment() {
     private fun agregarPuntoLocalizacion(nombre: String, latitud: Double, longitud: Double) {
         val punto = mapOf(
             "nombre" to nombre,
-            "descripcion" to "Descripción por defecto",
+            "descripcion" to "Descripción por defecto", //meterlo en el dialogo de creacion el campo este
             "latitud" to latitud,
             "longitud" to longitud,
-            "usuarioCreador" to "anónimo"
+            "usuarioCreador" to "anónimo" //coger el uid del usuario autenticado en ese momento
         )
+        //prueba
         db.collection("puntos_localizacion")
             .add(punto)
             .addOnSuccessListener {
