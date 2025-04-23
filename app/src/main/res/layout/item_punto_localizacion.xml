@@ -1,0 +1,72 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="@drawable/item_background"
+    android:elevation="4dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Contenedor de textos -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Nombre del punto -->
+        <TextView
+            android:id="@+id/nombreTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre del punto"
+            android:textColor="@color/primary_dark"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-medium"
+            android:paddingBottom="4dp" />
+
+        <!-- Latitud -->
+        <TextView
+            android:id="@+id/latitudTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Latitud"
+            android:textColor="@color/secondary_text"
+            android:textSize="14sp"
+            android:paddingBottom="2dp" />
+
+        <!-- Longitud -->
+        <TextView
+            android:id="@+id/longitudTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Longitud"
+            android:textColor="@color/secondary_text"
+            android:textSize="14sp"
+            android:paddingBottom="2dp" />
+
+        <!-- Distancia -->
+        <TextView
+            android:id="@+id/distanceText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Distancia"
+            android:textColor="@color/secondary_text"
+            android:textSize="14sp"
+            android:paddingBottom="2dp" />
+
+    </LinearLayout>
+
+    <!-- Semáforo (Círculo de proximidad) -->
+    <FrameLayout
+        android:id="@+id/semaforo"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/semaforo_gray" />
+</LinearLayout>
+

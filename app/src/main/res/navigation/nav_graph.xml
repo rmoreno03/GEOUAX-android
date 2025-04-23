@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <!-- HomeFragment -->
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.geouax.fragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/activity_main">
+
+        <action
+            android:id="@+id/action_homeFragment_to_mapaFragment"
+            app:destination="@id/mapaFragment" />
+
+
+    </fragment>
+
+
+    <!-- PuntoFragment -->
+    <fragment
+        android:id="@+id/puntoFragment"
+        android:name="com.example.geouax.fragments.PuntoFragment"
+        android:label="PuntoFragment"
+        tools:layout="@layout/fragment_punto" />
+
+
+    <!-- MapaFragment -->
+    <fragment
+        android:id="@+id/mapaFragment"
+        android:name="com.example.geouax.fragments.MapaFragment"
+        android:label="MapaFragment"
+        tools:layout="@layout/mapa_activity" />
+
+
+    <!-- PerfilFragment -->
+    <fragment
+        android:id="@+id/perfilFragment"
+        android:name="com.example.geouax.fragments.PerfilFragment"
+        android:label="PerfilFragment"
+        tools:layout="@layout/activity_perfil" />
+</navigation>
+

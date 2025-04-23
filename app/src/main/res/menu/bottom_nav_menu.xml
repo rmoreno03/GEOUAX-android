@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_home"
+        android:title="@string/inicio" />
+
+    <item
+        android:id="@+id/puntoFragment"
+        android:icon="@drawable/ic_punto"
+        android:title="@string/punto" />
+
+    <item
+        android:id="@+id/mapaFragment"
+        android:icon="@drawable/ic_mapa"
+        android:title="@string/mapa" />
+
+    <item
+        android:id="@+id/perfilFragment"
+        android:icon="@drawable/ic_perfil"
+        android:title="@string/perfil" />
+</menu>
+

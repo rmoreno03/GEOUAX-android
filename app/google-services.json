@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "861490577985",
+    "project_id": "aplicacion-geo-e0275",
+    "storage_bucket": "aplicacion-geo-e0275.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861490577985:android:b3c2d453c4d80922a4fcc0",
+        "android_client_info": {
+          "package_name": "com.example.geouax"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAl-DzTaahsUDKHmH7taM42crz1y3xm6pU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

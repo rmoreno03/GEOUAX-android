@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GEO UAX</string>
+    <string name="inicio">Inicio</string>
+    <string name="punto">Punto</string>
+    <string name="mapa">Mapa</string>
+    <string name="vacio">Vacío</string>
+    <string name="perfil">Perfil</string>
+</resources>
