@@ -46,10 +46,16 @@ class PuntoAdapter(
 
     inner class PuntoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nombreTextView: TextView = itemView.findViewById(R.id.nombreTextView)
+        private val latitudTextView: TextView = itemView.findViewById(R.id.latitudTextView)
+        private val longitudTextView: TextView = itemView.findViewById(R.id.longitudTextView)
         private val distanciaTextView: TextView = itemView.findViewById(R.id.distanceText)
+        private val semaforoView: View = itemView.findViewById(R.id.semaforo)
+
 
         fun bind(punto: Punto) {
             nombreTextView.text = punto.nombre
+            latitudTextView.text = "Latitud: ${punto.latitud}"
+            longitudTextView.text = "Longitud: ${punto.longitud}"
 
             val lat = latActual
             val lng = lngActual
@@ -57,10 +63,19 @@ class PuntoAdapter(
             if (lat != null && lng != null) {
                 val distancia = calcularDistancia(lat, lng, punto.latitud, punto.longitud)
                 distanciaTextView.text = String.format("%.2f km", distancia)
+
+                val background = when {
+                    distancia < 1000 -> R.drawable.semaforo_green
+                    distancia < 3000 -> R.drawable.semaforo_yellow
+                    else -> R.drawable.semaforo_red
+                }
+                semaforoView.setBackgroundResource(background)
             } else {
                 distanciaTextView.text = "Distancia desconocida"
+                semaforoView.setBackgroundResource(R.drawable.semaforo_gray)
             }
         }
+
 
         private fun calcularDistancia(
             lat1: Double, lon1: Double, lat2: Double, lon2: Double
