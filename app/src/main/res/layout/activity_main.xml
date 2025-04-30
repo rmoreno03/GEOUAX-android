@@ -6,9 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.example.geouax.fragments.HomeFragment">
 
-
-
-    <!-- Contenedor para los botones y RecyclerView -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,7 +14,6 @@
         android:background="@color/background_color"
         android:fitsSystemWindows="true">
 
-        <!-- Banner con el logo y título centrados -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -25,7 +21,6 @@
             android:gravity="center_vertical|center_horizontal"
             android:paddingBottom="16dp">
 
-            <!-- Logo de la aplicación -->
             <ImageView
                 android:id="@+id/logoImageView"
                 android:layout_width="48dp"
@@ -34,7 +29,6 @@
                 android:contentDescription="@string/app_name"
                 android:layout_marginEnd="16dp" />
 
-            <!-- Título de la aplicación -->
             <TextView
                 android:id="@+id/titleTextView"
                 android:layout_width="wrap_content"
@@ -46,7 +40,6 @@
                 android:fontFamily="sans-serif-medium" />
         </LinearLayout>
 
-        <!-- CardView que contiene los botones de acción -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,58 +51,50 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:background="@color/white"
                 android:padding="12dp">
 
-                <!-- Botón Añadir -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAdd"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Añadir Punto"
                     android:textSize="18sp"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:backgroundTint="@color/verde"
+                    style="@style/BotonGradient"
                     android:textColor="@android:color/white"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Botón Leer -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnRead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Leer Puntos"
                     android:textSize="18sp"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:backgroundTint="@color/azul"
+                    style="@style/BotonGradient"
                     android:textColor="@android:color/white"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Botón Actualizar -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnUpdate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Actualizar Punto"
                     android:textSize="18sp"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:backgroundTint="@color/amarillo"
+                    style="@style/BotonGradient"
                     android:textColor="@android:color/white"
                     android:layout_marginBottom="12dp" />
 
-                <!-- Botón Eliminar -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnDelete"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Eliminar Punto"
                     android:textSize="18sp"
-                    style="@style/Widget.MaterialComponents.Button"
-                    android:backgroundTint="@color/rojo"
+                    style="@style/BotonGradient"
                     android:textColor="@android:color/white" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- RecyclerView para mostrar los puntos -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"

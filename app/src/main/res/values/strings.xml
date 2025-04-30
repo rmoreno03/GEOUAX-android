@@ -2,8 +2,13 @@
 <resources>
     <string name="app_name">GEO UAX</string>
     <string name="inicio">Inicio</string>
-    <string name="punto">Punto</string>
+    <string name="punto">Rutas</string>
     <string name="mapa">Mapa</string>
-    <string name="vacio">Vacío</string>
     <string name="perfil">Perfil</string>
+
+    <string-array name="transport_modes">
+        <item>Coche</item>
+        <item>Bici</item>
+        <item>Andando</item>
+    </string-array>
 </resources>

@@ -20,6 +20,7 @@ import com.example.geouax.LocationControlador
 import com.example.geouax.Punto
 import com.example.geouax.PuntoAdapter
 import com.example.geouax.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeFragment : Fragment() {
@@ -122,9 +123,11 @@ class HomeFragment : Fragment() {
     private fun mostrarDialogoAgregarPunto() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Agregar Punto de Localización")
+
         val layout = LinearLayout(requireContext()).apply { orientation = LinearLayout.VERTICAL }
 
-        val inputId = EditText(requireContext()).apply { hint = "Nombre del punto" }
+        val inputNombre = EditText(requireContext()).apply { hint = "Nombre del punto" }
+        val inputDescripcion = EditText(requireContext()).apply { hint = "Descripción del punto" }
         val inputLatitud = EditText(requireContext()).apply {
             hint = "Latitud"
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL or InputType.TYPE_NUMBER_FLAG_SIGNED
@@ -134,17 +137,20 @@ class HomeFragment : Fragment() {
             inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL or InputType.TYPE_NUMBER_FLAG_SIGNED
         }
 
-        layout.addView(inputId)
+        layout.addView(inputNombre)
+        layout.addView(inputDescripcion)
         layout.addView(inputLatitud)
         layout.addView(inputLongitud)
         builder.setView(layout)
 
         builder.setPositiveButton("Agregar") { _, _ ->
-            val id = inputId.text.toString()
+            val nombre = inputNombre.text.toString()
+            val descripcion = inputDescripcion.text.toString()
             val latitud = inputLatitud.text.toString().toDoubleOrNull()
             val longitud = inputLongitud.text.toString().toDoubleOrNull()
-            if (id.isNotEmpty() && latitud != null && longitud != null) {
-                agregarPuntoLocalizacion(id, latitud, longitud)
+
+            if (nombre.isNotEmpty() && descripcion.isNotEmpty() && latitud != null && longitud != null) {
+                agregarPuntoLocalizacion(nombre, descripcion, latitud, longitud)
             } else {
                 Toast.makeText(requireContext(), "Por favor, completa todos los campos.", Toast.LENGTH_SHORT).show()
             }
@@ -152,6 +158,7 @@ class HomeFragment : Fragment() {
         builder.setNegativeButton("Cancelar", null)
         builder.show()
     }
+
 
     private fun mostrarDialogoSeleccionarPunto(callback: (Punto) -> Unit) {
         val puntosNombres = puntosList.map { it.nombre }.toTypedArray()
@@ -199,17 +206,26 @@ class HomeFragment : Fragment() {
     }
 
     private fun leerPuntosLocalizacion(callback: (List<Punto>) -> Unit) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val currentEmail = currentUser?.uid
+
+        if (currentEmail == null) {
+            Toast.makeText(requireContext(), "Debes iniciar sesión para ver tus puntos.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         db.collection("puntos_localizacion")
+            .whereEqualTo("usuarioCreador", currentEmail)
             .get()
             .addOnSuccessListener { result ->
                 val puntos = result.map { document ->
                     Punto(
                         id = document.id,
-                        nombre = document.get("nombre")?.toString() ?: "",
-                        descripcion = document.get("descripcion")?.toString() ?: "",
+                        nombre = document.get("nombre").toString(),
+                        descripcion = document.get("descripcion").toString(),
                         latitud = document.getDouble("latitud") ?: 0.0,
                         longitud = document.getDouble("longitud") ?: 0.0,
-                        usuarioCreador = document.get("usuarioCreador")?.toString() ?: ""
+                        usuarioCreador = document.get("usuarioCreador").toString()
                     )
                 }
                 callback(puntos)
@@ -219,24 +235,41 @@ class HomeFragment : Fragment() {
             }
     }
 
-    private fun agregarPuntoLocalizacion(nombre: String, latitud: Double, longitud: Double) {
-        val punto = mapOf(
+
+
+    private fun agregarPuntoLocalizacion(nombre: String, descripcion: String, latitud: Double, longitud: Double) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val currentUID = currentUser?.uid
+
+        if (currentUID == null) {
+            Toast.makeText(requireContext(), "Debes iniciar sesión para agregar puntos.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val punto = hashMapOf(
             "nombre" to nombre,
-            "descripcion" to "Descripción por defecto", //meterlo en el dialogo de creacion el campo este
+            "descripcion" to descripcion,
             "latitud" to latitud,
             "longitud" to longitud,
-            "usuarioCreador" to "anónimo" //coger el uid del usuario autenticado en ese momento
+            "usuarioCreador" to currentUID,
+            "fechaCreacion" to com.google.firebase.Timestamp.now()
         )
-        //prueba
+
         db.collection("puntos_localizacion")
             .add(punto)
             .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Punto agregado.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Punto agregado correctamente.", Toast.LENGTH_SHORT).show()
+                leerPuntosLocalizacion { puntos ->
+                    puntosList.clear()
+                    puntosList.addAll(puntos)
+                    actualizarDistanciasYNotificar()
+                }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(requireContext(), "Error al agregar: $e", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Error al agregar punto: $e", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     private fun actualizarPuntoLocalizacion(documentId: String, nuevaLatitud: Double, nuevaLongitud: Double) {
         db.collection("puntos_localizacion").document(documentId)

@@ -67,4 +67,6 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.5.3")
     implementation("com.google.firebase:firebase-firestore-ktx:24.1.0")
     implementation("com.google.firebase:firebase-auth-ktx:21.0.3")
+    implementation("com.google.android.gms:play-services-maps:18.0.0")
+
 }

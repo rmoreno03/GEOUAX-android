@@ -16,4 +16,15 @@
     <color name="rojo">#F44336</color>
     <color name="card_background">#F9F9F9</color>
     <color name="secondary_text">#757575</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#BBBBBB</color>
+    <color name="input_background">#333333</color>
+    <color name="input_text_hint">#888888</color>
+
+
+
+    <!-- Colores de gradiente -->
+    <color name="gradient_start">#FF0000</color>
+    <color name="gradient_end">#FFA500</color>
+    <color name="gradient_logout_end">#B22222</color>
 </resources>

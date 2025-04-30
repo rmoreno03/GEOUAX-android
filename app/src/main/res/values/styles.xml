@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+   <style name="BotonGradient" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@null</item>
+        <item name="android:background">@drawable/boton_gradient</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="cornerRadius">12dp</item>
+        <item name="android:stateListAnimator">@animator/button_state_list_animator</item>
+    </style>
+
+    <!-- Base application theme -->
+    <style name="Theme.GeoUax" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color -->
+        <item name="colorPrimary">@color/gradient_start</item>
+        <item name="colorPrimaryVariant">@color/gradient_end</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color -->
+        <item name="colorSecondary">@color/amarillo</item>
+        <item name="colorSecondaryVariant">@color/amarillo</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color -->
+        <item name="android:statusBarColor">@color/background_color</item>
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+    </style>
+
+    <!-- Estilo para campos de texto -->
+    <style name="CampoTextoEstilo" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/gradient_start</item>
+        <item name="boxStrokeWidth">2dp</item>
+        <item name="hintTextColor">@color/amarillo</item>
+        <item name="android:textColorHint">@color/input_text_hint</item>
+    </style>
+
+</resources>

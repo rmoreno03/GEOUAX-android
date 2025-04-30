@@ -1,14 +1,105 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_punto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewPuntos"
+    <!-- Lista de rutas -->
+    <LinearLayout
+        android:id="@+id/layoutRutas"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        android:scrollbars="vertical"/>
-</FrameLayout>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewRutas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <!-- Formulario para crear nueva ruta (inicialmente oculto) -->
+    <LinearLayout
+        android:id="@+id/layoutFormulario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- Campo de nombre de la ruta -->
+        <EditText
+            android:id="@+id/textNombreRuta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre de la ruta"
+            android:inputType="text" />
+
+
+        <!-- Botón para seleccionar puntos para la ruta -->
+        <Button
+            android:id="@+id/buttonSelectPuntos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/BotonGradient"
+            android:text="Seleccionar puntos para la ruta" />
+
+        <!-- Spinner para seleccionar tipo de transporte -->
+        <Spinner
+            android:id="@+id/spinnerTransportMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/transport_modes" />
+
+        <!-- Mapa para visualización de la ruta -->
+        <FrameLayout
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Botón para guardar la ruta (inicialmente oculto) -->
+        <Button
+            android:id="@+id/buttonGuardarRuta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
+            style="@style/BotonGradient"
+            android:text="Guardar Ruta"
+            android:visibility="gone" />
+
+        <!-- Botón para cancelar la creación de la ruta (inicialmente oculto) -->
+        <Button
+            android:id="@+id/buttonCancelarRuta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="48dp"
+            style="@style/BotonGradient"
+            android:text="Cancelar"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Botón fijo para generar nueva ruta -->
+    <Button
+        android:id="@+id/CrearnuevaRuta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="48dp"
+        style="@style/BotonGradient"
+        android:text="Generar Ruta" />
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
