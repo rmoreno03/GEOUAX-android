@@ -18,7 +18,9 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.widget.Toast
 import androidx.compose.ui.graphics.Color
+import com.example.geouax.Ruta
 import com.example.geouax.firestore.FirestoreHelper
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -28,11 +30,12 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.security.Timestamp
 
+
 class MapaFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
     private val db = FirebaseFirestore.getInstance()
-    private var puntosRuta: ArrayList<LatLng> = arrayListOf()
+    private var puntosRuta: List<Punto> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.mapa_activity, container, false)
@@ -48,30 +51,46 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         googleMap = map
         googleMap.clear()
 
-        // Recibimos los puntos de la ruta desde el Bundle
-        val puntosRuta = arguments?.getParcelableArrayList<LatLng>("puntos_ruta")
+        // Obtenemos la Ruta desde los argumentos
+        val ruta = arguments?.getParcelable<Ruta>("ruta")
 
-        if (!puntosRuta.isNullOrEmpty()) {
-            // Si los puntos de la ruta están presentes, mostramos la polilínea
-            val polylineOptions = PolylineOptions().addAll(puntosRuta).width(10f)
-            googleMap.addPolyline(polylineOptions)
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(puntosRuta.first(), 14f))
+        if (ruta != null && ruta.puntos.isNotEmpty()) {
+            puntosRuta = ruta.puntos
+            val boundsBuilder = LatLngBounds.builder()
 
-            // Agregamos marcadores en los puntos de inicio y fin
-            val origen = puntosRuta.first()
-            val destino = puntosRuta.last()
+            // Agregar marcadores y construir bounds
+            puntosRuta.forEachIndexed { index, punto ->
+                val latLng = LatLng(punto.latitud, punto.longitud)
+                val title = when (index) {
+                    0 -> "Inicio"
+                    puntosRuta.lastIndex -> "Fin"
+                    else -> "Punto ${index + 1}"
+                }
+                googleMap.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .title(title)
+                        .snippet(punto.descripcion)
+                )
+                boundsBuilder.include(latLng)
+            }
 
-            googleMap.addMarker(MarkerOptions().position(origen).title("Inicio"))
-            googleMap.addMarker(MarkerOptions().position(destino).title("Fin"))
+            // Dibujar línea con los puntos
+            val latLngs = puntosRuta.map { LatLng(it.latitud, it.longitud) }
+            googleMap.addPolyline(
+                PolylineOptions()
+                    .addAll(latLngs)
+                    .width(10f)
+            )
 
-            // Movemos la cámara para que enfoque la ruta
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origen, 14f))
+            // Ajustar cámara
+            val bounds = boundsBuilder.build()
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
         } else {
-            // Si no hay puntos en el Bundle, mostramos puntos de Firebase
             mostrarPuntosFirebase()
         }
 
-        // Listener para agregar puntos
+        // Escuchar clics en el mapa para agregar nuevos puntos
         googleMap.setOnMapClickListener { latLng ->
             mostrarDialogoAgregarPunto(latLng.latitude, latLng.longitude)
         }
@@ -86,7 +105,12 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
             puntosList.take(20).forEachIndexed { index, punto ->
                 val latLng = LatLng(punto.latitud, punto.longitud)
-                googleMap.addMarker(MarkerOptions().position(latLng).title(punto.nombre).snippet(punto.descripcion))
+                googleMap.addMarker(
+                    MarkerOptions()
+                        .position(latLng)
+                        .title(punto.nombre)
+                        .snippet(punto.descripcion)
+                )
                 if (index == 0) {
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f))
                 }
@@ -160,7 +184,12 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             .add(punto)
             .addOnSuccessListener {
                 Toast.makeText(requireContext(), "Punto agregado correctamente.", Toast.LENGTH_SHORT).show()
-                googleMap.addMarker(MarkerOptions().position(LatLng(latitud, longitud)).title(nombre).snippet(descripcion))
+                googleMap.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(latitud, longitud))
+                        .title(nombre)
+                        .snippet(descripcion)
+                )
             }
             .addOnFailureListener { e ->
                 Toast.makeText(requireContext(), "Error al agregar punto: $e", Toast.LENGTH_SHORT).show()
@@ -172,7 +201,6 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         if (::googleMap.isInitialized) googleMap.clear()
     }
 }
-
 
 
 
