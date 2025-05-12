@@ -17,26 +17,29 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import android.widget.Toast
+import androidx.compose.ui.graphics.Color
 import com.example.geouax.firestore.FirestoreHelper
+import com.google.android.gms.maps.model.PolylineOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.maps.android.PolyUtil
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+import java.security.Timestamp
 
 class MapaFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
-    private var puntos: List<Punto> = listOf()
     private val db = FirebaseFirestore.getInstance()
+    private var puntosRuta: ArrayList<LatLng> = arrayListOf()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.mapa_activity, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
     }
@@ -45,46 +48,47 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         googleMap = map
         googleMap.clear()
 
-        // Modo clic en el mapa para agregar punto
+        // Recibimos los puntos de la ruta desde el Bundle
+        val puntosRuta = arguments?.getParcelableArrayList<LatLng>("puntos_ruta")
+
+        if (!puntosRuta.isNullOrEmpty()) {
+            // Si los puntos de la ruta están presentes, mostramos la polilínea
+            val polylineOptions = PolylineOptions().addAll(puntosRuta).width(10f)
+            googleMap.addPolyline(polylineOptions)
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(puntosRuta.first(), 14f))
+
+            // Agregamos marcadores en los puntos de inicio y fin
+            val origen = puntosRuta.first()
+            val destino = puntosRuta.last()
+
+            googleMap.addMarker(MarkerOptions().position(origen).title("Inicio"))
+            googleMap.addMarker(MarkerOptions().position(destino).title("Fin"))
+
+            // Movemos la cámara para que enfoque la ruta
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(origen, 14f))
+        } else {
+            // Si no hay puntos en el Bundle, mostramos puntos de Firebase
+            mostrarPuntosFirebase()
+        }
+
+        // Listener para agregar puntos
         googleMap.setOnMapClickListener { latLng ->
             mostrarDialogoAgregarPunto(latLng.latitude, latLng.longitude)
         }
+    }
 
-        val lat = arguments?.getDouble("latitud", Double.NaN) ?: Double.NaN
-        val lng = arguments?.getDouble("longitud", Double.NaN) ?: Double.NaN
-        val nombre = arguments?.getString("nombre")
-        val descripcion = arguments?.getString("descripcion")
+    private fun mostrarPuntosFirebase() {
+        FirestoreHelper.getAllPuntos { puntosList ->
+            if (puntosList.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), "No hay puntos para mostrar", Toast.LENGTH_SHORT).show()
+                return@getAllPuntos
+            }
 
-        if (!lat.isNaN() && !lng.isNaN() && nombre != null) {
-            // Modo punto único
-            val puntoLatLng = LatLng(lat, lng)
-            googleMap.addMarker(
-                MarkerOptions()
-                    .position(puntoLatLng)
-                    .title(nombre)
-                    .snippet(descripcion ?: "")
-            )
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(puntoLatLng, 15f))
-        } else {
-            // Modo general
-            FirestoreHelper.getAllPuntos { puntosList ->
-                if (puntosList.isNullOrEmpty()) {
-                    Toast.makeText(requireContext(), "No hay puntos para mostrar", Toast.LENGTH_SHORT).show()
-                    return@getAllPuntos
-                }
-
-                val puntosLimitados = puntosList.take(20)
-                puntosLimitados.forEachIndexed { index, punto ->
-                    val latLng = LatLng(punto.latitud, punto.longitud)
-                    googleMap.addMarker(
-                        MarkerOptions()
-                            .position(latLng)
-                            .title(punto.nombre)
-                            .snippet(punto.descripcion)
-                    )
-                    if (index == 0) {
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f))
-                    }
+            puntosList.take(20).forEachIndexed { index, punto ->
+                val latLng = LatLng(punto.latitud, punto.longitud)
+                googleMap.addMarker(MarkerOptions().position(latLng).title(punto.nombre).snippet(punto.descripcion))
+                if (index == 0) {
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12f))
                 }
             }
         }
@@ -101,13 +105,11 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
         val inputNombre = EditText(requireContext()).apply { hint = "Nombre del punto" }
         val inputDescripcion = EditText(requireContext()).apply { hint = "Descripción del punto" }
-
         val inputLatitud = EditText(requireContext()).apply {
             hint = "Latitud"
             setText(latitud.toString())
             isEnabled = false
         }
-
         val inputLongitud = EditText(requireContext()).apply {
             hint = "Longitud"
             setText(longitud.toString())
@@ -158,13 +160,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             .add(punto)
             .addOnSuccessListener {
                 Toast.makeText(requireContext(), "Punto agregado correctamente.", Toast.LENGTH_SHORT).show()
-                // Puedes actualizar el mapa o recargar los puntos si deseas
-                googleMap.addMarker(
-                    MarkerOptions()
-                        .position(LatLng(latitud, longitud))
-                        .title(nombre)
-                        .snippet(descripcion)
-                )
+                googleMap.addMarker(MarkerOptions().position(LatLng(latitud, longitud)).title(nombre).snippet(descripcion))
             }
             .addOnFailureListener { e ->
                 Toast.makeText(requireContext(), "Error al agregar punto: $e", Toast.LENGTH_SHORT).show()
@@ -173,11 +169,10 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (::googleMap.isInitialized) {
-            googleMap.clear()
-        }
+        if (::googleMap.isInitialized) googleMap.clear()
     }
 }
+
 
 
 
