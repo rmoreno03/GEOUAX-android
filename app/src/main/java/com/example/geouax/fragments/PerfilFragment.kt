@@ -40,6 +40,9 @@ class PerfilFragment : Fragment() {
     private lateinit var tickPuntos: TextView
     private lateinit var tickRutas: TextView
 
+    // Listener para cuando cambia el estado de autenticación
+    private var authStateListener: ((Boolean) -> Unit)? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,6 +65,8 @@ class PerfilFragment : Fragment() {
         emailInputLayout = view.findViewById(R.id.textInputLayoutEmail)
         passwordInputLayout = view.findViewById(R.id.textInputLayoutPassword)
         buttonAchievements = view.findViewById(R.id.buttonAchievements)
+        // Inicializar layoutAchievements - Este era el error principal
+        layoutAchievements = view.findViewById(R.id.layoutLogros)
         progressBar1 = view.findViewById(R.id.progressBar1)
         progressBar2 = view.findViewById(R.id.progressBar2)
         profileCardView = view.findViewById(R.id.cardViewProfile)
@@ -89,12 +94,20 @@ class PerfilFragment : Fragment() {
             auth.signOut()
             mostrarMensaje("Sesión cerrada correctamente")
             actualizarVista()
+            // Notificar al listener que el usuario cerró sesión
+            authStateListener?.invoke(false)
         }
 
         actualizarVista()
     }
 
     private fun mostrarLogros() {
+        // Verificar si layoutAchievements está inicializado
+        if (!::layoutAchievements.isInitialized) {
+            mostrarError("Error: No se pudo mostrar logros")
+            return
+        }
+
         layoutAchievements.visibility = View.VISIBLE
         profileCardView.visibility = View.GONE
 
@@ -150,7 +163,6 @@ class PerfilFragment : Fragment() {
             if (photoUrl != null) {
                 Glide.with(this)
                     .load(photoUrl)
-
                     .circleCrop()
                     .into(profileImageView)
             }
@@ -162,10 +174,16 @@ class PerfilFragment : Fragment() {
             logoutButton.visibility = View.VISIBLE
             buttonAchievements.visibility = View.VISIBLE
             profileCardView.visibility = View.VISIBLE
-            layoutAchievements.visibility = View.GONE
+
+            // Verificar si layoutAchievements está inicializado antes de usarlo
+            if (::layoutAchievements.isInitialized) {
+                layoutAchievements.visibility = View.GONE
+            }
+
+            // Notificar al listener que el usuario inició sesión
+            authStateListener?.invoke(true)
         } else {
             statusTextView.text = "Inicia sesión para continuar"
-
 
             emailInputLayout.visibility = View.VISIBLE
             passwordInputLayout.visibility = View.VISIBLE
@@ -174,7 +192,14 @@ class PerfilFragment : Fragment() {
             logoutButton.visibility = View.GONE
             buttonAchievements.visibility = View.GONE
             profileCardView.visibility = View.VISIBLE
-            layoutAchievements.visibility = View.GONE
+
+            // Verificar si layoutAchievements está inicializado antes de usarlo
+            if (::layoutAchievements.isInitialized) {
+                layoutAchievements.visibility = View.GONE
+            }
+
+            // Notificar al listener que el usuario cerró sesión
+            authStateListener?.invoke(false)
         }
     }
 
@@ -247,5 +272,31 @@ class PerfilFragment : Fragment() {
         loginButton.isEnabled = !mostrar
         registerButton.isEnabled = !mostrar
         logoutButton.isEnabled = !mostrar
+    }
+
+    // Métodos para la integración con MapaFragment
+
+    fun isUserLoggedIn(): Boolean {
+        return auth.currentUser != null
+    }
+
+    fun getCurrentUserId(): String? {
+        return auth.currentUser?.uid
+    }
+
+    fun getCurrentUserEmail(): String? {
+        return auth.currentUser?.email
+    }
+
+    // Método para establecer un listener para cambios en el estado de autenticación
+    fun setAuthStateListener(listener: (Boolean) -> Unit) {
+        this.authStateListener = listener
+        // Notificar el estado actual
+        listener(isUserLoggedIn())
+    }
+
+    // Método para obtener la instancia de FirebaseAuth
+    fun getAuthInstance(): FirebaseAuth {
+        return auth
     }
 }

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tvNombreRuta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:text="Nombre de la ruta"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tvDistancia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Distancia: 0.0 km"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvDuracion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Duración: 0 min"
+        android:layout_marginBottom="4dp"/>
+
+    <TextView
+        android:id="@+id/tvTipoRuta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="Tipo: driving"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnGuardarRuta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Guardar Ruta"
+        android:backgroundTint="@color/teal_700"/>
+
+</LinearLayout>

@@ -71,8 +71,9 @@ dependencies {
     implementation("com.google.maps.android:android-maps-utils:2.2.5")
     implementation("com.google.android.gms:play-services-maps:17.0.1")
     implementation("com.google.android.gms:play-services-location:17.0.0")
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation (libs.glide)
+
+
 
 
 }

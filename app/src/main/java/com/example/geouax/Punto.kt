@@ -10,7 +10,7 @@ data class Punto(
     val longitud: Double = 0.0,
     val nombre: String = "",
     val descripcion: String = "",
-    val usuarioCreador: String = "",
+    val usuarioCreador: String? = null,
     val fechaCreacion: Timestamp? = null,
     val fotos: List<String>? = null,
     var distancia: String = "",
