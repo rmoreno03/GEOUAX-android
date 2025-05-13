@@ -15,7 +15,9 @@ import android.widget.ImageView
 import android.view.animation.AnimationUtils
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FirebaseFirestore
 
 class PerfilFragment : Fragment() {
 
@@ -34,6 +36,9 @@ class PerfilFragment : Fragment() {
     private lateinit var progressBar1: ProgressBar
     private lateinit var progressBar2: ProgressBar
     private lateinit var profileCardView: CardView
+    private lateinit var db: FirebaseFirestore
+    private lateinit var tickPuntos: TextView
+    private lateinit var tickRutas: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,7 +52,6 @@ class PerfilFragment : Fragment() {
 
         auth = FirebaseAuth.getInstance()
 
-        // Inicializar vistas
         emailEditText = view.findViewById(R.id.editTextEmail)
         passwordEditText = view.findViewById(R.id.editTextPassword)
         loginButton = view.findViewById(R.id.buttonLogin)
@@ -58,31 +62,29 @@ class PerfilFragment : Fragment() {
         emailInputLayout = view.findViewById(R.id.textInputLayoutEmail)
         passwordInputLayout = view.findViewById(R.id.textInputLayoutPassword)
         buttonAchievements = view.findViewById(R.id.buttonAchievements)
-        layoutAchievements = view.findViewById(R.id.layoutAchievements)
         progressBar1 = view.findViewById(R.id.progressBar1)
         progressBar2 = view.findViewById(R.id.progressBar2)
         profileCardView = view.findViewById(R.id.cardViewProfile)
+        db = FirebaseFirestore.getInstance()
+        tickPuntos = view.findViewById(R.id.tickPuntos)
+        tickRutas = view.findViewById(R.id.tickRutas)
 
-        // Botón de logros
         buttonAchievements.setOnClickListener {
             mostrarLogros()
         }
 
-        // Botón login
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
             loginUser(email, password)
         }
 
-        // Botón registro
         registerButton.setOnClickListener {
             val email = emailEditText.text.toString()
             val password = passwordEditText.text.toString()
             registerUser(email, password)
         }
 
-        // Botón logout
         logoutButton.setOnClickListener {
             auth.signOut()
             mostrarMensaje("Sesión cerrada correctamente")
@@ -93,37 +95,65 @@ class PerfilFragment : Fragment() {
     }
 
     private fun mostrarLogros() {
-        // Cambia visibilidad entre perfil y logros
         layoutAchievements.visibility = View.VISIBLE
         profileCardView.visibility = View.GONE
 
         val user = auth.currentUser
         if (user != null) {
-            val puntos = obtenerPuntosDeUbicacion(user)
-            val rutas = obtenerRutasCreadas(user)
+            obtenerPuntosDeUbicacion(user) { puntos ->
+                progressBar1.max = 10
+                progressBar1.progress = puntos
+                tickPuntos.text = if (puntos >= 10) "✅" else ""
+            }
 
-            progressBar1.max = 10
-            progressBar2.max = 3
-
-            progressBar1.progress = puntos
-            progressBar2.progress = rutas
+            obtenerRutasCreadas(user) { rutas ->
+                progressBar2.max = 3
+                progressBar2.progress = rutas
+                tickRutas.text = if (rutas >= 3) "✅" else ""
+            }
         }
     }
 
-    private fun obtenerPuntosDeUbicacion(user: FirebaseUser): Int {
-        // Aquí puedes conectar con Firestore o base de datos
-        return 5 // Simulación
+    private fun obtenerPuntosDeUbicacion(user: FirebaseUser, callback: (Int) -> Unit) {
+        db.collection("puntos_localizacion")
+            .whereEqualTo("usuarioCreador", user.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                callback(documents.size())
+            }
+            .addOnFailureListener {
+                mostrarError("Error al obtener puntos de localización")
+                callback(0)
+            }
     }
 
-    private fun obtenerRutasCreadas(user: FirebaseUser): Int {
-        // Aquí puedes conectar con Firestore o base de datos
-        return 2 // Simulación
+    private fun obtenerRutasCreadas(user: FirebaseUser, callback: (Int) -> Unit) {
+        db.collection("rutas")
+            .whereEqualTo("usuarioCreador", user.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                callback(documents.size())
+            }
+            .addOnFailureListener {
+                mostrarError("Error al obtener rutas")
+                callback(0)
+            }
     }
 
     private fun actualizarVista() {
         val user = auth.currentUser
         if (user != null) {
             statusTextView.text = "Bienvenido, ${user.email}"
+
+            // Cargar avatar si está disponible
+            val photoUrl = user.photoUrl
+            if (photoUrl != null) {
+                Glide.with(this)
+                    .load(photoUrl)
+
+                    .circleCrop()
+                    .into(profileImageView)
+            }
 
             emailInputLayout.visibility = View.GONE
             passwordInputLayout.visibility = View.GONE
@@ -135,6 +165,7 @@ class PerfilFragment : Fragment() {
             layoutAchievements.visibility = View.GONE
         } else {
             statusTextView.text = "Inicia sesión para continuar"
+
 
             emailInputLayout.visibility = View.VISIBLE
             passwordInputLayout.visibility = View.VISIBLE
