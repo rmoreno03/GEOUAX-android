@@ -39,6 +39,9 @@ class PerfilFragment : Fragment() {
     private lateinit var db: FirebaseFirestore
     private lateinit var tickPuntos: TextView
     private lateinit var tickRutas: TextView
+    private lateinit var layoutBarraRutaLarga: LinearLayout
+    private lateinit var progressBar3: ProgressBar
+    private lateinit var tickRutaLarga: TextView
 
     // Listener para cuando cambia el estado de autenticación
     private var authStateListener: ((Boolean) -> Unit)? = null
@@ -73,6 +76,9 @@ class PerfilFragment : Fragment() {
         db = FirebaseFirestore.getInstance()
         tickPuntos = view.findViewById(R.id.tickPuntos)
         tickRutas = view.findViewById(R.id.tickRutas)
+        layoutBarraRutaLarga = view.findViewById(R.id.layoutBarraRutaLarga)
+        progressBar3 = view.findViewById(R.id.progressBar3)
+        tickRutaLarga = view.findViewById(R.id.tickRutaLarga)
 
         buttonAchievements.setOnClickListener {
             mostrarLogros()
@@ -101,6 +107,23 @@ class PerfilFragment : Fragment() {
         actualizarVista()
     }
 
+    private fun obtenerRutaLarga(user: FirebaseUser, callback: (Boolean) -> Unit) {
+        db.collection("rutas")
+            .whereEqualTo("usuarioCreador", user.uid)
+            .get()
+            .addOnSuccessListener { documents ->
+                val tieneRutaLarga = documents.any {
+                    val distancia = it.getDouble("distanciaKm") ?: 0.0
+                    distancia > 10.0
+                }
+                callback(tieneRutaLarga)
+            }
+            .addOnFailureListener {
+                mostrarError("Error al verificar rutas largas")
+                callback(false)
+            }
+    }
+
     private fun mostrarLogros() {
         // Verificar si layoutAchievements está inicializado
         if (!::layoutAchievements.isInitialized) {
@@ -123,6 +146,11 @@ class PerfilFragment : Fragment() {
                 progressBar2.max = 3
                 progressBar2.progress = rutas
                 tickRutas.text = if (rutas >= 3) "✅" else ""
+            }
+            obtenerRutaLarga(user) { tieneRutaLarga ->
+                progressBar3.max = 1
+                progressBar3.progress = if (tieneRutaLarga) 1 else 0
+                tickRutaLarga.text = if (tieneRutaLarga) "✅" else ""
             }
         }
     }
