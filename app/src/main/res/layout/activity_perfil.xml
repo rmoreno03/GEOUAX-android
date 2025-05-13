@@ -1,22 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/perfil_background">
 
+    <!-- Título de la app -->
+    <TextView
+        android:id="@+id/textViewAppName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="GeoUAX"
+        android:textColor="@color/text_primary"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Card con el perfil -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewProfile"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         app:cardCornerRadius="20dp"
         app:cardElevation="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textViewAppName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.45">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -102,8 +115,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:cornerRadius="12dp"
-                style="@style/BotonGradient"
-                />
+                style="@style/BotonGradient" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonRegister"
@@ -115,8 +127,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:cornerRadius="12dp"
-                style="@style/BotonGradient"
-                />
+                style="@style/BotonGradient" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonLogout"
@@ -129,23 +140,74 @@
                 android:textStyle="bold"
                 android:visibility="gone"
                 app:cornerRadius="12dp"
-                style="@style/BotonGradient"
-                />
+                style="@style/BotonGradient" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonAchievements"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:text="Logros de Usuario"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:cornerRadius="12dp"
+                style="@style/BotonGradient" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <TextView
-        android:id="@+id/textViewAppName"
-        android:layout_width="wrap_content"
+    <!-- Sección de Logros de Usuario -->
+    <LinearLayout
+        android:id="@+id/layoutAchievements"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="GeoUAX"
-        android:textColor="@color/text_primary"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/cardViewProfile"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Logro 1 -->
+        <TextView
+            android:id="@+id/achievementTitle1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Crear 10 puntos de ubicación"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="0"
+            android:max="10"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Logro 2 -->
+        <TextView
+            android:id="@+id/achievementTitle2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Crear 3 rutas"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ProgressBar
+            android:id="@+id/progressBar2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="0"
+            android:max="3"
+            style="@android:style/Widget.ProgressBar.Horizontal" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

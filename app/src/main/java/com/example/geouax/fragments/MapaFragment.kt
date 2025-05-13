@@ -51,14 +51,14 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         googleMap = map
         googleMap.clear()
 
-        // Obtenemos la Ruta desde los argumentos
+        // Obtener la Ruta desde los argumentos (ya es Parcelable)
         val ruta = arguments?.getParcelable<Ruta>("ruta")
 
         if (ruta != null && ruta.puntos.isNotEmpty()) {
             puntosRuta = ruta.puntos
             val boundsBuilder = LatLngBounds.builder()
 
-            // Agregar marcadores y construir bounds
+            // Agregar marcadores
             puntosRuta.forEachIndexed { index, punto ->
                 val latLng = LatLng(punto.latitud, punto.longitud)
                 val title = when (index) {
@@ -66,6 +66,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
                     puntosRuta.lastIndex -> "Fin"
                     else -> "Punto ${index + 1}"
                 }
+
                 googleMap.addMarker(
                     MarkerOptions()
                         .position(latLng)
@@ -75,22 +76,23 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
                 boundsBuilder.include(latLng)
             }
 
-            // Dibujar línea con los puntos
+            // Dibujar la línea de la ruta
             val latLngs = puntosRuta.map { LatLng(it.latitud, it.longitud) }
             googleMap.addPolyline(
                 PolylineOptions()
                     .addAll(latLngs)
                     .width(10f)
+                    .color(R.color.teal_700) // puedes personalizar el color aquí
             )
 
-            // Ajustar cámara
+            // Ajustar cámara al conjunto de puntos
             val bounds = boundsBuilder.build()
             googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
         } else {
             mostrarPuntosFirebase()
         }
 
-        // Escuchar clics en el mapa para agregar nuevos puntos
+        // Escuchar clics para agregar nuevos puntos
         googleMap.setOnMapClickListener { latLng ->
             mostrarDialogoAgregarPunto(latLng.latitude, latLng.longitude)
         }
@@ -201,8 +203,6 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         if (::googleMap.isInitialized) googleMap.clear()
     }
 }
-
-
 
 
 

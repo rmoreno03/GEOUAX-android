@@ -211,19 +211,13 @@ class PuntoFragment : Fragment() {
     }
 
     private fun mostrarRutaEnMapa(ruta: Ruta) {
-        val puntos = ruta.puntos
-        if (puntos.size < 2) {
-            Toast.makeText(requireContext(), "Ruta no tiene puntos válidos", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         val args = Bundle().apply {
-            putParcelableArrayList("puntos_ruta", ArrayList(puntos.map {
-                LatLng(it.latitud, it.longitud)
-            }))
+            putParcelable("ruta", ruta)
         }
 
-        val mapaFragment = MapaFragment().apply { arguments = args }
+        val mapaFragment = MapaFragment().apply {
+            arguments = args
+        }
 
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, mapaFragment)
