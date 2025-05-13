@@ -62,6 +62,7 @@ class PerfilFragment : Fragment() {
         emailInputLayout = view.findViewById(R.id.textInputLayoutEmail)
         passwordInputLayout = view.findViewById(R.id.textInputLayoutPassword)
         buttonAchievements = view.findViewById(R.id.buttonAchievements)
+        layoutAchievements = view.findViewById(R.id.layoutAchievements)
         progressBar1 = view.findViewById(R.id.progressBar1)
         progressBar2 = view.findViewById(R.id.progressBar2)
         profileCardView = view.findViewById(R.id.cardViewProfile)

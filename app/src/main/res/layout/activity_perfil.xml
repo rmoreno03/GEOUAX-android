@@ -157,95 +157,104 @@
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
-
-    <!-- Sección de Logros de Usuario -->
     <LinearLayout
-        android:id="@+id/layoutBarraPuntos"
+        android:id="@+id/layoutAchievements"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardViewProfile">
 
-        <TextView
-            android:id="@+id/achievementTitle1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Crear 10 puntos de ubicación"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="4dp" />
-
+    <!-- Sección de Logros de Usuario -->
         <LinearLayout
+            android:id="@+id/layoutBarraPuntos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ProgressBar
-                android:id="@+id/progressBar1"
-                style="@android:style/Widget.ProgressBar.Horizontal"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:progress="0"
-                android:max="10" />
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardViewProfile">
 
             <TextView
-                android:id="@+id/tickPuntos"
+                android:id="@+id/achievementTitle1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="20sp"
-                android:paddingStart="8dp" />
+                android:text="Crear 10 puntos de ubicación"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ProgressBar
+                    android:id="@+id/progressBar1"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:progress="0"
+                    android:max="10" />
+
+                <TextView
+                    android:id="@+id/tickPuntos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="20sp"
+                    android:paddingStart="8dp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layoutBarraRutas"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutBarraPuntos">
-
-        <TextView
-            android:id="@+id/achievementTitle2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Crear 3 rutas"
-            android:textColor="@color/text_primary"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="4dp" />
 
         <LinearLayout
+            android:id="@+id/layoutBarraRutas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ProgressBar
-                android:id="@+id/progressBar2"
-                style="@android:style/Widget.ProgressBar.Horizontal"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:progress="0"
-                android:max="3" />
+            android:orientation="vertical"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layoutBarraPuntos">
 
             <TextView
-                android:id="@+id/tickRutas"
+                android:id="@+id/achievementTitle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="20sp"
-                android:paddingStart="8dp" />
+                android:text="Crear 3 rutas"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ProgressBar
+                    android:id="@+id/progressBar2"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:progress="0"
+                    android:max="3" />
+
+                <TextView
+                    android:id="@+id/tickRutas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="20sp"
+                    android:paddingStart="8dp" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
