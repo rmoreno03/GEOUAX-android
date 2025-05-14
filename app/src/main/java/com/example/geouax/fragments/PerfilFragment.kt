@@ -32,6 +32,7 @@ class PerfilFragment : Fragment() {
     private lateinit var emailInputLayout: TextInputLayout
     private lateinit var passwordInputLayout: TextInputLayout
     private lateinit var buttonAchievements: MaterialButton
+    private lateinit var btnVolverPerfil: MaterialButton
     private lateinit var layoutAchievements: LinearLayout
     private lateinit var progressBar1: ProgressBar
     private lateinit var progressBar2: ProgressBar
@@ -79,6 +80,13 @@ class PerfilFragment : Fragment() {
         layoutBarraRutaLarga = view.findViewById(R.id.layoutBarraRutaLarga)
         progressBar3 = view.findViewById(R.id.progressBar3)
         tickRutaLarga = view.findViewById(R.id.tickRutaLarga)
+        btnVolverPerfil = view.findViewById(R.id.btnVolverPerfil)
+
+        btnVolverPerfil.setOnClickListener {
+            layoutAchievements.visibility = View.GONE
+            profileCardView.visibility = View.VISIBLE
+        }
+
 
         buttonAchievements.setOnClickListener {
             mostrarLogros()
