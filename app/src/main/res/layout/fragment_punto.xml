@@ -5,13 +5,66 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Contenedor de botones de rutas -->
+    <!-- Botones para alternar entre todas las rutas y mis rutas -->
     <LinearLayout
-        android:id="@+id/layoutRutas"
+        android:id="@+id/layoutSelectorRutas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="8dp">
+
+        <Button
+            android:id="@+id/buttonTodasRutas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Todas las rutas"
+            style="@style/BotonGradient" />
+
+        <Button
+            android:id="@+id/buttonMisRutas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Mis rutas"
+            style="@style/BotonGradient" />
+    </LinearLayout>
+
+    <!-- Contenedor de todas las rutas -->
+    <ScrollView
+        android:id="@+id/scrollTodasRutas"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical" />
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/layoutRutas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:clipToPadding="false" />
+    </ScrollView>
+
+    <!-- Contenedor de solo mis rutas (oculto por defecto) -->
+    <ScrollView
+        android:id="@+id/scrollMisRutas"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/layoutMisRutas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:clipToPadding="false" />
+    </ScrollView>
 
     <!-- Formulario para crear nueva ruta (inicialmente oculto) -->
     <LinearLayout
@@ -19,15 +72,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:background="@drawable/layout_formulario_background"
+        android:layout_margin="16dp">
 
         <!-- Campo de nombre de la ruta -->
         <EditText
             android:id="@+id/textNombreRuta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/boton_ruta_background"
+            android:textColor="@color/black"
             android:hint="Nombre de la ruta"
-            android:inputType="text" />
+            android:padding="16dp"
+            android:textColorHint="@color/gray"
+            android:inputType="text"
+            android:layout_marginBottom="10dp" />
 
         <!-- Botón para seleccionar puntos para la ruta -->
         <Button

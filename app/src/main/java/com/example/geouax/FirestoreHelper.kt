@@ -13,16 +13,16 @@ object FirestoreHelper {
     private val db = FirebaseFirestore.getInstance()
 
     // Función para obtener los puntos desde Firestore
-    fun getAllPuntos(callback: (List<Punto>?) -> Unit) {
+    fun getPuntosDelUsuario(usuarioId: String, callback: (List<Punto>?) -> Unit) {
         val puntosCollection = db.collection("puntos_localizacion")
 
         puntosCollection
+            .whereEqualTo("usuarioCreador", usuarioId)  // Filtramos solo puntos del usuario
             .get()
             .addOnSuccessListener { result ->
                 val puntos = mutableListOf<Punto>()
                 for (document in result) {
                     try {
-                        // Asegúrate de que el documento contenga los campos adecuados
                         val id = document.id
                         val nombre = document.getString("nombre") ?: ""
                         val descripcion = document.getString("descripcion") ?: ""
@@ -31,20 +31,20 @@ object FirestoreHelper {
                         val usuarioCreador = document.getString("usuarioCreador")
                         val fechaCreacion = document.getTimestamp("fechaCreacion")
 
-                        // Creamos un objeto Punto con los datos obtenidos
                         val punto = Punto(id, latitud, longitud, nombre, descripcion, usuarioCreador, fechaCreacion)
                         puntos.add(punto)
                     } catch (e: Exception) {
                         Log.e(TAG, "Error parseando documento: ${document.id}", e)
                     }
                 }
-                callback(puntos)  // Llamamos al callback con la lista de puntos
+                callback(puntos)
             }
             .addOnFailureListener { exception ->
                 Log.e(TAG, "Error obteniendo puntos: ", exception)
-                callback(null)  // Llamamos al callback con null en caso de error
+                callback(null)
             }
     }
+
 
     // Función para obtener las rutas desde Firestore
     fun getAllRutas(callback: (List<Ruta>?) -> Unit) {

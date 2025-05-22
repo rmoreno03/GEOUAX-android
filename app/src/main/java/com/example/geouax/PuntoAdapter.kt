@@ -65,8 +65,8 @@ class PuntoAdapter(
                 distanciaTextView.text = String.format("%.2f km", distancia)
 
                 val background = when {
-                    distancia < 1000 -> R.drawable.semaforo_green
-                    distancia < 3000 -> R.drawable.semaforo_yellow
+                    distancia < 1 -> R.drawable.semaforo_green
+                    distancia < 5 -> R.drawable.semaforo_yellow
                     else -> R.drawable.semaforo_red
                 }
                 semaforoView.setBackgroundResource(background)

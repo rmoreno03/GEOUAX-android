@@ -53,6 +53,8 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
     private lateinit var fabLimpiar: FloatingActionButton
     private lateinit var fabPuntos: FloatingActionButton
     private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
+    private var puntoDesdeHome: Punto? = null
+
 
     // Variable para controlar el estado de autenticación
     private var isUserLoggedIn = false
@@ -84,6 +86,32 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         fabLimpiar = view.findViewById(R.id.fabLimpiar)
         fabPuntos = view.findViewById(R.id.fabVerPuntos)
 
+        arguments?.let { args ->
+            val lat = args.getDouble("latitud", Double.NaN)
+            val lng = args.getDouble("longitud", Double.NaN)
+            val nombre = args.getString("nombre")
+            val descripcion = args.getString("descripcion")
+
+            if (!lat.isNaN() && !lng.isNaN() && nombre != null && descripcion != null) {
+                puntoDesdeHome = Punto(
+                    id = "", // No necesario aquí
+                    nombre = nombre,
+                    descripcion = descripcion,
+                    latitud = lat,
+                    longitud = lng,
+                    usuarioCreador = ""
+                )
+            }
+        }
+        val fabMostrarSoloSeleccionado = view.findViewById<FloatingActionButton>(R.id.fabMostrarSoloSeleccionado)
+        fabMostrarSoloSeleccionado.setOnClickListener {
+            puntoDesdeHome?.let {
+                mostrarSoloPunto(it)
+            } ?: Toast.makeText(requireContext(), "No hay punto seleccionado", Toast.LENGTH_SHORT).show()
+        }
+
+
+
         // Configurar los listeners de los FABs
         fabRuta.setOnClickListener {
             if (!isUserLoggedIn) {
@@ -112,6 +140,19 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
     }
+
+    private fun mostrarSoloPunto(punto: Punto) {
+        googleMap.clear()
+        val ubicacion = LatLng(punto.latitud, punto.longitud)
+        googleMap.addMarker(
+            MarkerOptions()
+                .position(ubicacion)
+                .title(punto.nombre)
+                .snippet(punto.descripcion)
+        )
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ubicacion, 15f))
+    }
+
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
@@ -281,6 +322,12 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun mostrarPuntosFirebase() {
+        val usuarioId = FirebaseAuth.getInstance().currentUser?.uid
+        if (usuarioId == null) {
+            mostrarMensaje("No hay usuario conectado")
+            return
+        }
+
         // Mostrar un diálogo de carga
         val loadingDialog = AlertDialog.Builder(requireContext())
             .setTitle("Cargando puntos")
@@ -290,12 +337,12 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
         loadingDialog.show()
 
-        FirestoreHelper.getAllPuntos { puntosList ->
+        FirestoreHelper.getPuntosDelUsuario(usuarioId) { puntosList ->
             loadingDialog.dismiss()
 
             if (puntosList.isNullOrEmpty()) {
                 mostrarMensaje("No hay puntos para mostrar")
-                return@getAllPuntos
+                return@getPuntosDelUsuario
             }
 
             // Limpiar marcadores anteriores pero conservar puntos seleccionados
@@ -349,6 +396,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
+
 
     private fun mostrarDialogoAgregarPunto(latitud: Double, longitud: Double) {
         // Verificar si el usuario ha iniciado sesión
@@ -929,20 +977,22 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun limpiarMarcadoresNoSeleccionados() {
-        // Conservar puntos seleccionados
-        val marcadoresSeleccionados = marcadores.filter { marker ->
+        // Conservar solo los marcadores cuyo tag sea un Punto válido y que coincidan con inicio o destino
+        val marcadoresSeleccionados = marcadores.filterNotNull().filter { marker ->
             val punto = marker.tag as? Punto
-            punto == puntoInicio || punto == puntoDestino
+            punto != null && (punto == puntoInicio || punto == puntoDestino)
         }
 
-        // Limpiar el mapa y volver a agregar solo los marcadores seleccionados
+        // Limpiar el mapa y listas
         googleMap.clear()
         polylines.clear()
         marcadores.clear()
 
+        // Volver a agregar los marcadores seleccionados
         marcadoresSeleccionados.forEach { marker ->
-            val punto = marker.tag as Punto
+            val punto = marker.tag as? Punto ?: return@forEach
             val latLng = LatLng(punto.latitud, punto.longitud)
+
             val nuevoMarker = googleMap.addMarker(
                 MarkerOptions()
                     .position(latLng)
@@ -950,25 +1000,20 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
                     .snippet(marker.snippet)
                     .icon(
                         when (punto) {
-                            puntoInicio -> BitmapDescriptorFactory.defaultMarker(
-                                BitmapDescriptorFactory.HUE_GREEN
-                            )
-
-                            puntoDestino -> BitmapDescriptorFactory.defaultMarker(
-                                BitmapDescriptorFactory.HUE_RED
-                            )
-
+                            puntoInicio -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
+                            puntoDestino -> BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
                             else -> BitmapDescriptorFactory.defaultMarker()
                         }
                     )
             )
 
-            if (nuevoMarker != null) {
-                nuevoMarker.tag = punto
-                marcadores.add(nuevoMarker)
+            nuevoMarker?.let {
+                it.tag = punto
+                marcadores.add(it)
             }
         }
     }
+
 
     private fun formatearDistancia(distanciaKm: Double): String {
         return DecimalFormat("0.00").format(distanciaKm)

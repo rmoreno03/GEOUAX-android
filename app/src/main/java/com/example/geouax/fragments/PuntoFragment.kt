@@ -2,10 +2,15 @@ package com.example.geouax.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
+import android.text.style.RelativeSizeSpan
 import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +40,9 @@ class PuntoFragment : Fragment() {
     private lateinit var layoutFormulario: LinearLayout
     private val rutasUsuario = mutableListOf<Ruta>()
     private val puntosUsuario = mutableListOf<Punto>()
+    private lateinit var layoutMisRutas: LinearLayout
+    private lateinit var scrollTodasRutas: ScrollView
+    private lateinit var scrollMisRutas: ScrollView
 
     private var puntoInicioSeleccionado: Punto? = null
     private var puntoFinSeleccionado: Punto? = null
@@ -54,6 +62,22 @@ class PuntoFragment : Fragment() {
         val buttonSelectPuntos: Button = view.findViewById(R.id.buttonSelectPuntos)
         val buttonGuardarRuta: Button = view.findViewById(R.id.buttonGuardarRuta)
         val buttonCancelarRuta: Button = view.findViewById(R.id.buttonCancelarRuta)
+        layoutMisRutas = view.findViewById(R.id.layoutMisRutas)
+        scrollTodasRutas = view.findViewById(R.id.scrollTodasRutas)
+        scrollMisRutas = view.findViewById(R.id.scrollMisRutas)
+
+        val buttonTodasRutas: Button = view.findViewById(R.id.buttonTodasRutas)
+        val buttonMisRutas: Button = view.findViewById(R.id.buttonMisRutas)
+
+        buttonTodasRutas.setOnClickListener {
+            scrollTodasRutas.visibility = View.VISIBLE
+            scrollMisRutas.visibility = View.GONE
+        }
+
+        buttonMisRutas.setOnClickListener {
+            scrollTodasRutas.visibility = View.GONE
+            scrollMisRutas.visibility = View.VISIBLE
+        }
 
         buttonCrearRuta.setOnClickListener { mostrarFormularioCreacionRuta() }
         buttonCancelarRuta.setOnClickListener { ocultarFormularioCreacionRuta() }
@@ -71,25 +95,86 @@ class PuntoFragment : Fragment() {
             .get()
             .addOnSuccessListener { result ->
                 rutasUsuario.clear()
-                layoutRutas.removeAllViews() // Limpiar vistas anteriores
+                layoutRutas.removeAllViews()
+                layoutMisRutas.removeAllViews()
+
+                val usuariosCache = mutableMapOf<String, String>()
 
                 for (document in result) {
                     val ruta = document.toObject(Ruta::class.java).copy(id = document.id)
                     rutasUsuario.add(ruta)
 
-                    val botonRuta = Button(requireContext()).apply {
-                        text = ruta.nombre
-                        setOnClickListener {
-                            mostrarRutaEnMapa(ruta)
+                    val uidCreador = ruta.usuarioCreador
+
+                    val agregarBoton = { nombreCreador: String ->
+                        if (uidCreador == user.uid) {
+                            agregarBotonRuta(ruta, nombreCreador, layoutMisRutas)
                         }
+                        agregarBotonRuta(ruta, nombreCreador, layoutRutas)
                     }
 
-                    layoutRutas.addView(botonRuta)
+                    if (usuariosCache.containsKey(uidCreador)) {
+                        agregarBoton(usuariosCache[uidCreador]!!)
+                    } else {
+                        db.collection("usuarios").document(uidCreador)
+                            .get()
+                            .addOnSuccessListener { userDoc ->
+                                val nombreCreador = userDoc.getString("nombre") ?: "Usuario desconocido"
+                                usuariosCache[uidCreador] = nombreCreador
+                                agregarBoton(nombreCreador)
+                            }
+                            .addOnFailureListener {
+                                agregarBoton("Usuario desconocido")
+                            }
+                    }
                 }
             }
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Error al cargar rutas", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun agregarBotonRuta(ruta: Ruta, nombreCreador: String, contenedor: LinearLayout) {
+        val botonRuta = Button(ContextThemeWrapper(requireContext(), R.style.EstiloBotonRuta)).apply {
+            val nombreRuta = ruta.nombre
+            val creador = "Creado por: $nombreCreador"
+
+            val spannable = SpannableString("$nombreRuta\n$creador")
+            spannable.setSpan(
+                RelativeSizeSpan(1.3f), 0, nombreRuta.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(context, R.color.black)), 0, nombreRuta.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(context, R.color.gray)), nombreRuta.length + 1, spannable.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                RelativeSizeSpan(0.9f), nombreRuta.length + 1, spannable.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            text = spannable
+            setPadding(40, 48, 40, 48)
+            gravity = Gravity.START or Gravity.CENTER_VERTICAL
+            isAllCaps = false
+
+            background = ContextCompat.getDrawable(requireContext(), R.drawable.boton_ruta_background)
+            stateListAnimator = null
+            elevation = 6f
+
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 6, 0, 6)
+            }
+
+            setOnClickListener {
+                mostrarRutaEnMapa(ruta)
+            }
+        }
+
+        contenedor.addView(botonRuta)
     }
 
     private fun cargarPuntosUsuario() {
@@ -226,7 +311,6 @@ class PuntoFragment : Fragment() {
     }
 
     private fun mostrarFormularioCreacionRuta() {
-        layoutRutas.visibility = View.GONE
         layoutFormulario.visibility = View.VISIBLE
         view?.findViewById<Button>(R.id.buttonGuardarRuta)?.visibility = View.VISIBLE
         view?.findViewById<Button>(R.id.buttonCancelarRuta)?.visibility = View.VISIBLE

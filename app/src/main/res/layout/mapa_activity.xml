@@ -16,9 +16,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        android:layout_marginBottom="80dp"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:layout_marginBottom="80dp">
+        android:padding="16dp">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fabCalcularRuta"
@@ -44,10 +44,21 @@
             android:id="@+id/fabVerPuntos"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
             android:contentDescription="Ver Puntos"
             app:backgroundTint="@color/purple_500"
             app:fabSize="normal"
-            app:srcCompat="@android:drawable/ic_dialog_info" />
+            app:srcCompat="@drawable/ic_recargar" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fabMostrarSoloSeleccionado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Mostrar Solo Seleccionado"
+            android:src="@drawable/ic_pin"
+            app:fabSize="normal" />
     </LinearLayout>
+
 </FrameLayout>
 
